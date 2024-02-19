@@ -81,9 +81,12 @@ class MainActivity : ComponentActivity() {
                                 NavigationDrawerItem(
                                     label = { Text(text = "Login") },
                                     selected = false,
-                                    onClick = { scope.launch {
-                                        navController.navigate("loginScreen")
-                                        drawerState.close() } },
+                                    onClick = {
+                                        scope.launch {
+                                            navController.navigate("loginScreen")
+                                            drawerState.close()
+                                        }
+                                    },
                                     icon = {
                                         Icon(
                                             imageVector = Icons.Filled.Lock,
@@ -91,8 +94,17 @@ class MainActivity : ComponentActivity() {
                                         )
                                     })
                             }
-                        }, drawerState = drawerState) {
-                        NavHost(navController = navController, startDestination = "categoriesScreen") {
+                        }, drawerState = drawerState
+                    ) {
+                        NavHost(
+                            navController = navController,
+                            startDestination = "categoriesScreen"
+                        ) {
+
+                            composable(route = "postsScreen") {
+                                PostsScreen()
+                            }
+
                             composable(route = "categoriesScreen") {
                                 CategoriesScreen(onMenuClick = {
                                     scope.launch {

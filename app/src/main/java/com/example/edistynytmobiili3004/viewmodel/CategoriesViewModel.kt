@@ -5,6 +5,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.edistynytmobiili3004.api.categoriesService
 import com.example.edistynytmobiili3004.model.CategoriesState
 import com.example.edistynytmobiili3004.model.CategoryItem
 import kotlinx.coroutines.delay
@@ -28,18 +29,18 @@ class CategoriesViewModel : ViewModel() {
     private fun getCategories() {
 
         viewModelScope.launch {
-            Log.d("juhani", "in getCategories:: starting to fetch data")
-            _categoriesState.value = _categoriesState.value.copy(loading = true)
-            waitForCategories()
-            _categoriesState.value = categoriesState.value.copy(
-                loading = false,
-                list = listOf(
-                    CategoryItem(id=1, name="Kategoria1"),
-                    CategoryItem(id=2, name="Kategoria2")
-                )
-            )
+            try {
+                Log.d("juhani", "in getCategories:: starting to fetch data")
+                _categoriesState.value = _categoriesState.value.copy(loading = true)
+                val response = categoriesService.getCategories()
+                _categoriesState.value = categoriesState.value.copy(
+                    loading = false,
+                    list = response.categories
 
-            Log.d("juhani", "in getCategories:: done  fetching data")
+                )
+
+                Log.d("juhani", "in getCategories:: done  fetching data")
+            } catch(e: Exception) {}
 
         }
     }
