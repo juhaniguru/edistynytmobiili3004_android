@@ -32,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -76,8 +77,10 @@ fun CategoriesScreen(onMenuClick: () -> Unit) {
                                 Text("Kuva")
                                 Column(horizontalAlignment = Alignment.End) {
                                     Text(
-                                        text = it.category_name,
-                                        style = MaterialTheme.typography.headlineLarge
+                                        text = it.category_name.take(30),
+                                        style = MaterialTheme.typography.headlineSmall,
+                                        overflow = TextOverflow.Ellipsis,
+                                        maxLines = 1
                                     )
                                     IconButton(onClick = { /*TODO*/ }) {
                                         Icon(
