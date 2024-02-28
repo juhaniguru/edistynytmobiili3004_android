@@ -110,12 +110,17 @@ class MainActivity : ComponentActivity() {
                                     scope.launch {
                                         drawerState.open()
                                     }
+                                }, navigateToEditCategory = {
+                                    navController.navigate("editCategoryScreen/${it}")
                                 })
                             }
                             composable("loginScreen") {
                                 LoginScreen(goToCategories = {
                                     navController.navigate("categoriesScreen")
                                 })
+                            }
+                            composable("editCategoryScreen/{categoryId}") {
+                                EditCategoryScreen()
                             }
                         }
 
