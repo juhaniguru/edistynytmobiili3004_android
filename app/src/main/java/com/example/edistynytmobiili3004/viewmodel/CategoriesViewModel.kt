@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.edistynytmobiili3004.api.categoriesService
 import com.example.edistynytmobiili3004.model.CategoriesState
 import com.example.edistynytmobiili3004.model.CategoryItem
+import com.example.edistynytmobiili3004.model.DeleteCategoryState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -18,8 +19,36 @@ class CategoriesViewModel : ViewModel() {
     private val _categoriesState = mutableStateOf(CategoriesState())
     val categoriesState: State<CategoriesState> = _categoriesState
 
+    private val _deleteCategoryState = mutableStateOf(DeleteCategoryState())
+    val deleteCategoryState: State<DeleteCategoryState> = _deleteCategoryState
+
     init {
         getCategories()
+    }
+
+    fun verifyCategoryRemoval(categoryId: Int) {
+        _deleteCategoryState.value = _deleteCategoryState.value.copy(id=categoryId)
+    }
+    fun deleteCategoryById(categoryId: Int) {
+
+        viewModelScope.launch {
+            try {
+                categoriesService.removeCategory(categoryId)
+                val listOfCategories = _categoriesState.value.list.filter {
+                    // jos tämä ehto on totta, menee vuorossa oleva item listaan
+                    // jos tämä ehto ei ole totta, jää itemi listasta pois
+                    categoryId != it.id
+                }
+
+
+                _categoriesState.value = _categoriesState.value.copy(list=listOfCategories)
+            } catch(e: Exception) {
+                Log.d("juhani", e.toString())
+            } finally {
+                //
+            }
+        }
+
     }
 
     private suspend fun waitForCategories() {
