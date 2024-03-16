@@ -22,3 +22,9 @@ data class CategoryItem(
 )
 
 data class CategoriesResponse(val categories: List<CategoryItem> = emptyList())
+data class CategoryResponse(val category: CategoryItem = CategoryItem())
+
+data class EditCategoryReq(
+    @SerializedName("category_name")
+    val name: String
+)
