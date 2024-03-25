@@ -8,6 +8,11 @@ data class CategoriesState(
     val err: String? = null
 )
 
+data class AddCategoryReq(
+    @SerializedName("category_name")
+    val name: String = ""
+)
+
 data class CategoryState(
     val item: CategoryItem = CategoryItem(),
     val loading: Boolean = false,

@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
@@ -25,6 +26,8 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -76,16 +79,31 @@ fun ConfirmCategoryDelete(onConfirm: () -> Unit, onCancel: () -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CategoriesScreen(onMenuClick: () -> Unit, navigateToEditCategory: (Int) -> Unit) {
+fun CategoriesScreen(
+    onMenuClick: () -> Unit,
+    navigateToEditCategory: (Int) -> Unit,
+    navigateToAddCategory: () -> Unit,
+    size: WindowSizeInfo
+) {
     val categoriesVm: CategoriesViewModel = viewModel()
 
-    Scaffold(topBar = {
-        TopAppBar(title = { Text(text = "Categories") }, navigationIcon = {
-            IconButton(onClick = { onMenuClick() }) {
-                Icon(imageVector = Icons.Default.Menu, contentDescription = "Menu")
+    Scaffold(
+        floatingActionButtonPosition = FabPosition.Center,
+        floatingActionButton = {
+
+            FloatingActionButton(
+
+                onClick = { navigateToAddCategory() }) {
+                Icon(imageVector = Icons.Default.Add, contentDescription = "Add Category")
             }
-        })
-    }) {
+        },
+        topBar = {
+            TopAppBar(title = { Text(text = "Categories") }, navigationIcon = {
+                IconButton(onClick = { onMenuClick() }) {
+                    Icon(imageVector = Icons.Default.Menu, contentDescription = "Menu")
+                }
+            })
+        }) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -107,38 +125,115 @@ fun CategoriesScreen(onMenuClick: () -> Unit, navigateToEditCategory: (Int) -> U
                     categoriesVm.verifyCategoryRemoval(0)
                 })
 
-                else -> LazyColumn {
-                    items(categoriesVm.categoriesState.value.list) {
-                        Column(modifier = Modifier.fillMaxWidth()) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(8.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                RandomImage()
-                                Spacer(modifier = Modifier.width(16.dp))
-                                Column(horizontalAlignment = Alignment.End) {
-                                    Text(
-                                        text = it.name,
-                                        style = MaterialTheme.typography.headlineSmall,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis
-                                    )
-                                    IconButton(onClick = { categoriesVm.verifyCategoryRemoval(it.id) }) {
-                                        Icon(
-                                            imageVector = Icons.Default.Delete,
-                                            contentDescription = "Delete"
-                                        )
-                                    }
-                                    IconButton(onClick = { navigateToEditCategory(it.id) }) {
-                                        Icon(
-                                            imageVector = Icons.Default.Edit,
-                                            contentDescription = "Edit"
-                                        )
-                                    }
-                                }
+                else -> {
+                    if (
+                        size.widthInfo is WindowType.Compact
+                        || size.widthInfo is WindowType.Medium
+                    ) {
+                        LazyColumnCategories(
+                            categories = categoriesVm.categoriesState.value.list,
+                            verifyCategoryRemoval = { categoryId ->
+                                categoriesVm.verifyCategoryRemoval(categoryId)
+                            },
+                            navigateToEditCategory = { categoryId ->
+                                navigateToEditCategory(categoryId)
                             }
+                        )
+                    } else {
+                        LazyVerticalGridCategories(
+                            categories = categoriesVm.categoriesState.value.list,
+                            verifyCategoryRemoval = { categoryId ->
+                                categoriesVm.verifyCategoryRemoval(categoryId)
+                            },
+                            navigateToEditCategory = { categoryId ->
+                                navigateToEditCategory(categoryId)
+                            }
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun LazyVerticalGridCategories(
+    categories: List<CategoryItem>,
+    verifyCategoryRemoval: (Int) -> Unit,
+    navigateToEditCategory: (Int) -> Unit
+) {
+    LazyVerticalGrid(columns = GridCells.Fixed(2)) {
+        items(categories) {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    RandomImage()
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Column(horizontalAlignment = Alignment.End) {
+                        Text(
+                            text = it.name,
+                            style = MaterialTheme.typography.headlineSmall,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        IconButton(onClick = { verifyCategoryRemoval(it.id) }) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Delete"
+                            )
+                        }
+                        IconButton(onClick = { navigateToEditCategory(it.id) }) {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = "Edit"
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun LazyColumnCategories(
+    categories: List<CategoryItem>,
+    verifyCategoryRemoval: (Int) -> Unit,
+    navigateToEditCategory: (Int) -> Unit
+) {
+    LazyColumn {
+        items(categories) {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    RandomImage()
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Column(horizontalAlignment = Alignment.End) {
+                        Text(
+                            text = it.name,
+                            style = MaterialTheme.typography.headlineSmall,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        IconButton(onClick = { verifyCategoryRemoval(it.id) }) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Delete"
+                            )
+                        }
+                        IconButton(onClick = { navigateToEditCategory(it.id) }) {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = "Edit"
+                            )
                         }
                     }
                 }

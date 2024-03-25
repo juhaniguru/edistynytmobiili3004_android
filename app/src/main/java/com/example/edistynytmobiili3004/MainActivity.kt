@@ -54,6 +54,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             EdistynytMobiili3004Theme {
+                val windowSizeInfo = rememberWindowSize()
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -98,7 +99,7 @@ class MainActivity : ComponentActivity() {
                     ) {
                         NavHost(
                             navController = navController,
-                            startDestination = "categoriesScreen"
+                            startDestination = Screen.Categories.route
                         ) {
 
                             composable(route = "postsScreen") {
@@ -112,7 +113,10 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }, navigateToEditCategory = {
                                     navController.navigate("editCategoryScreen/${it}")
-                                })
+                                },
+                                    navigateToAddCategory = {
+                                        navController.navigate("addCategoryScreen")
+                                    }, windowSizeInfo)
                             }
                             composable("loginScreen") {
                                 LoginScreen(goToCategories = {
@@ -136,6 +140,16 @@ class MainActivity : ComponentActivity() {
                                         navController.navigate("categoriesScreen")
                                     })
 
+                            }
+
+                            composable("addCategoryScreen") {
+                                AddCategoryScreen(navigateToCategoriesScreen =  {
+                                    navController.navigate("categoriesScreen") {
+                                        popUpTo("addCategoryScreen") {
+                                            inclusive = true
+                                        }
+                                    }
+                                })
                             }
                         }
 
